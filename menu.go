@@ -50,7 +50,7 @@ func main() {
 	TabPelanggan.data[1] = Pelanggan{username: "andi", saldo: 15000}
 	TabPelanggan.BanyakPelanggan = 2
 
-	// Loop utama tanpa break/continue
+	// Loop utama
 	for running {
 		fmt.Println("===========================================")
 		fmt.Println("=== SELAMAT DATANG DI APLIKASI KATALOG DIGITAL CAFE ===")
@@ -61,15 +61,16 @@ func main() {
 		if username == "exit" {
 			running = false
 		} else if username == "admin" {
-			fmt.Printf("\nHalo Admin! Anda masuk ke Mode Manajemen Menu.\n")
+			fmt.Printf("\nHalo Admin!\n")
 			loopAdmin := true
 			for loopAdmin {
 				fmt.Println("=== MENU ADMIN ===")
 				fmt.Println("1. Tambah Menu")
-				fmt.Println("2. Hapus Menu (Binary Search)")
-				fmt.Println("3. Tampilkan Menu Terurut Harga (Selection Sort)")
-				fmt.Println("4. Keluar (Log Out)")
-				fmt.Print("Pilih opsi (1-4): ")
+				fmt.Println("2. Hapus Menu")
+				fmt.Println("3. Tampilkan Menu Termahal")
+				fmt.Println("4. Tampilkan Menu Termurah")
+				fmt.Println("5. Keluar (Log Out)")
+				fmt.Print("Pilih opsi (1-5): ")
 				fmt.Scan(&pilihan)
 
 				if pilihan == 1 {
@@ -77,10 +78,12 @@ func main() {
 				} else if pilihan == 2 {
 					hapusMenuBinary(&TabMenu)
 				} else if pilihan == 3 {
-					menuSortingTampilan(TabMenu)
+					menuSortingTampilan(TabMenu, 1)
 				} else if pilihan == 4 {
+					menuSortingTampilan(TabMenu, 2)
+				} else if pilihan == 5 {
 					fmt.Println("\nKeluar dari sistem admin...\n")
-					loopAdmin = false // Mengganti break
+					loopAdmin = false
 				} else {
 					fmt.Println("Pilihan tidak valid!\n")
 				}
@@ -94,9 +97,11 @@ func main() {
 				fmt.Println("1. Cek Saldo")
 				fmt.Println("2. Top Up Saldo")
 				fmt.Println("3. Tampilkan Menu Berdasarkan Kategori")
-				fmt.Println("4. Pesan Menu")
-				fmt.Println("5. Keluar (Log Out)")
-				fmt.Print("Pilih opsi (1-5): ")
+				fmt.Println("4. Tampilkan Menu Termahal")
+				fmt.Println("5. Tampilkan Menu Termurah")
+				fmt.Println("6. Pesan Menu")
+				fmt.Println("7. Keluar (Log Out)")
+				fmt.Print("Pilih opsi (1-7): ")
 				fmt.Scan(&pilihan)
 
 				if pilihan == 1 {
@@ -114,10 +119,14 @@ func main() {
 				} else if pilihan == 3 {
 					TampilkanMenuSesuaiKategoriPelanggan(TabMenu)
 				} else if pilihan == 4 {
-					pesanMenu(&TabMenu, &TabPelanggan.data[idxUser].saldo)
+					menuSortingTampilan(TabMenu, 1)
 				} else if pilihan == 5 {
+					menuSortingTampilan(TabMenu, 2)
+				} else if pilihan == 6 {
+					pesanMenu(&TabMenu, &TabPelanggan.data[idxUser].saldo)
+				} else if pilihan == 7 {
 					fmt.Println("\nKeluar dari akun pelanggan...\n")
-					loopPelanggan = false // Mengganti break
+					loopPelanggan = false
 				} else {
 					fmt.Println("Pilihan tidak valid!\n")
 				}
@@ -125,8 +134,6 @@ func main() {
 		}
 	}
 }
-
-// ================= SUBPROGRAM DENGAN SPESIFIKASI BERPARAMETER =================
 
 /*
 Spesifikasi Subprogram:
@@ -182,7 +189,7 @@ func tambahMenu(TabMenu *DaftarMenu) {
 /*
 Spesifikasi Subprogram:
 IS: Terdefinisi data TabMenu terisi.
-FS: Mengurutkan menu internal secara alfabetis (A-Z) khusus sebagai syarat jalan Binary Search.
+FS: Mengurutkan menu internal secara alfabetis (A-Z).
 */
 func urutkanMenuBerdasarNamaAsc(TabMenu *DaftarMenu) {
 	var i, j, idxMin int
@@ -201,7 +208,7 @@ func urutkanMenuBerdasarNamaAsc(TabMenu *DaftarMenu) {
 }
 
 /*
-Spesifikasi Subprogram (MEMENUHI ATURAN BINARY SEARCH UNTUK PENGHAPUSAN):
+Spesifikasi Subprogram:
 IS: Terdefinisi pointer TabMenu terisi data acak/urut.
 FS: Mencari data berdasarkan nama menu menggunakan Binary Search, jika ketemu, elemen dihapus dengan cara menggeser array.
 */
@@ -211,7 +218,7 @@ func hapusMenuBinary(TabMenu *DaftarMenu) {
 		return
 	}
 
-	urutkanMenuBerdasarNamaAsc(TabMenu) // Wajib diurutkan sebelum Binary Search
+	urutkanMenuBerdasarNamaAsc(TabMenu)
 
 	fmt.Println("\n=== DAFTAR MENU SAAT INI (URUT ABJAD) ===")
 	TampilkanMenu(*TabMenu)
@@ -220,7 +227,6 @@ func hapusMenuBinary(TabMenu *DaftarMenu) {
 	fmt.Print("Masukkan NAMA menu yang ingin dihapus: ")
 	fmt.Scan(&namaCari)
 
-	// LOGIKA BINARY SEARCH
 	kr := 0
 	kn := TabMenu.BanyakMenu - 1
 	indexHapus := -1
@@ -241,18 +247,17 @@ func hapusMenuBinary(TabMenu *DaftarMenu) {
 		return
 	}
 
-	// Penghapusan dengan pergeseran array
 	for i := indexHapus; i < TabMenu.BanyakMenu-1; i++ {
 		TabMenu.data[i] = TabMenu.data[i+1]
 	}
 	TabMenu.BanyakMenu--
-	fmt.Println("SUKSES: MENU BERHASIL DIHAPUS VIA BINARY SEARCH\n")
+	fmt.Println("SUKSES: MENU BERHASIL DIHAPUS\n")
 }
 
 /*
 Spesifikasi Subprogram:
 IS: Terdefinisi data TabMenu terisi.
-FS: Menampilkan daftar seluruh data menu ke layar komputer secara tabular.
+FS: Menampilkan daftar seluruh data menu ke layar komputer.
 */
 func TampilkanMenu(TabMenu DaftarMenu) {
 	if TabMenu.BanyakMenu == 0 {
@@ -268,32 +273,36 @@ func TampilkanMenu(TabMenu DaftarMenu) {
 }
 
 /*
-Spesifikasi Subprogram (MEMENUHI ATURAN SORTING SELECTION & INSERTION DENGAN ASC/DESC):
-IS: Terdefinisi salinan data TabMenu.
-FS: Mengurutkan menu berdasarkan harga menggunakan Selection Sort atau Insertion Sort, baik secara Ascending atau Descending sesuai input user.
+Spesifikasi Subprogram:
+IS: Terdefinisi salinan data TabMenu dan opsi pengurutan (1 untuk Termahal, 2 untuk Termurah).
+FS: Mengurutkan menu berdasarkan harga. Opsi 1 menggunakan Insertion Sort (Descending),
+    Opsi 2 menggunakan Selection Sort (Ascending), lalu menampilkan hasilnya ke layar komputer.
 */
-func menuSortingTampilan(TabMenu DaftarMenu) {
-	var algoritma, jenisUrutan int
-	fmt.Println("\nPilih Algoritma Pengurutan Harga:")
-	fmt.Println("1. Selection Sort")
-	fmt.Println("2. Insertion Sort")
-	fmt.Print("Pilihan (1-2): ")
-	fmt.Scan(&algoritma)
+func menuSortingTampilan(TabMenu DaftarMenu, opsi int) {
+	if TabMenu.BanyakMenu == 0 {
+		fmt.Println("\n--- Menu Kosong ---\n")
+		return
+	}
 
-	fmt.Println("Pilih Urutan:")
-	fmt.Println("1. Naik (Ascending)")
-	fmt.Println("2. Turun (Descending)")
-	fmt.Print("Pilihan (1-2): ")
-	fmt.Scan(&jenisUrutan)
-
-	if algoritma == 1 {
-		// SELECTION SORT
+	if opsi == 1 {
+		// 1. TERMAHAL -> INSERTION SORT (Descending)
+		fmt.Println("\n=== DAFTAR MENU TERMAHAL ===")
+		for i := 1; i < TabMenu.BanyakMenu; i++ {
+			key := TabMenu.data[i]
+			j := i - 1
+			for j >= 0 && TabMenu.data[j].harga < key.harga {
+				TabMenu.data[j+1] = TabMenu.data[j]
+				j--
+			}
+			TabMenu.data[j+1] = key
+		}
+	} else if opsi == 2 {
+		// 2. TERMURAH -> SELECTION SORT (Ascending)
+		fmt.Println("\n=== DAFTAR MENU TERMURAH ===")
 		for i := 0; i < TabMenu.BanyakMenu-1; i++ {
 			idxTarget := i
 			for j := i + 1; j < TabMenu.BanyakMenu; j++ {
-				if jenisUrutan == 1 && TabMenu.data[j].harga < TabMenu.data[idxTarget].harga {
-					idxTarget = j
-				} else if jenisUrutan == 2 && TabMenu.data[j].harga > TabMenu.data[idxTarget].harga {
+				if TabMenu.data[j].harga < TabMenu.data[idxTarget].harga {
 					idxTarget = j
 				}
 			}
@@ -301,28 +310,16 @@ func menuSortingTampilan(TabMenu DaftarMenu) {
 			TabMenu.data[i] = TabMenu.data[idxTarget]
 			TabMenu.data[idxTarget] = tukar
 		}
-	} else {
-		// INSERTION SORT
-		for i := 1; i < TabMenu.BanyakMenu; i++ {
-			key := TabMenu.data[i]
-			j := i - 1
-			if jenisUrutan == 1 {
-				for j >= 0 && TabMenu.data[j].harga > key.harga {
-					TabMenu.data[j+1] = TabMenu.data[j]
-					j--
-				}
-			} else {
-				for j >= 0 && TabMenu.data[j].harga < key.harga {
-					TabMenu.data[j+1] = TabMenu.data[j]
-					j--
-				}
-			}
-			TabMenu.data[j+1] = key
-		}
 	}
+
 	TampilkanMenu(TabMenu)
 }
 
+/*
+Spesifikasi Subprogram:
+IS: Terdefinisi data TabMenu dan string kategoriPilihan.
+FS: Menampilkan daftar menu yang sesuai dengan kategoriPilihan, serta mengembalikan array indeks asli menu tersebut.
+*/
 func TampilkanMenuPerKategori(TabMenu DaftarMenu, kategoriPilihan string) [NMAX]int {
 	var indeksAsli [NMAX]int
 	jumlahFilter := 0
@@ -343,6 +340,11 @@ func TampilkanMenuPerKategori(TabMenu DaftarMenu, kategoriPilihan string) [NMAX]
 	return indeksAsli
 }
 
+/*
+Spesifikasi Subprogram:
+IS: Terdefinisi data TabMenu terisi.
+FS: Menampilkan daftar pilihan kategori yang unik, lalu menyaring menu berdasarkan pilihan user.
+*/
 func TampilkanMenuSesuaiKategoriPelanggan(TabMenu DaftarMenu) {
 	if TabMenu.BanyakMenu == 0 {
 		fmt.Println("Belum ada menu yang tersedia.\n")
@@ -380,6 +382,11 @@ func TampilkanMenuSesuaiKategoriPelanggan(TabMenu DaftarMenu) {
 	}
 }
 
+/*
+Spesifikasi Subprogram:
+IS: Terdefinisi pointer TabMenu berisi data katalog menu dan pointer saldo milik pelanggan.
+FS: Saldo berkurang jika pemesanan berhasil dan stok/nominal mencukupi, jika gagal memunculkan pesan kesalahan.
+*/
 func pesanMenu(TabMenu *DaftarMenu, saldo *float64) {
 	if TabMenu.BanyakMenu == 0 {
 		fmt.Println("Belum ada menu yang tersedia.\n")
